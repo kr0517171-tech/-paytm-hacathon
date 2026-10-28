@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paytm - Super Offline AI Wallet & Assistant</title>
+    <style>
+        :root {
+            --paytm-dark: #002e6e;
+            --paytm-light: #00baf2;
+            --paytm-blue: #00509d;
+            --bg-gray: #f5f7fa;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-gray);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-screen {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* ऑथेंटिक पेटीएम टॉप बार */
+        .paytm-navbar {
+            background-color: var(--paytm-dark);
+            color: var(--white);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-icon {
+            width: 35px;
+            height: 35px;
+            background-color: #214478;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 1.5px solid var(--paytm-light);
+        }
+
+        .paytm-logo-text {
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .paytm-logo-text span {
+            color: var(--paytm-light);
+        }
+
+        .offline-tag {
+            background-color: #ff9900;
+            color: black;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .main-content {
+            padding: 15px;
+            flex: 1;
+        }
+
+        /* वॉलेट बैलेंस कार्ड */
+        .balance-strip {
+            background: linear-gradient(135deg, #002e6e, #00509d);
+            border-radius: 16px;
+            padding: 18px;
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+
+        .balance-val {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        /* 🤖 सुपर पावरफुल AI असिस्टेंट पैनल */
+        .ai-assistant-card {
+            background: #f0fafc;
+            border: 1.5px solid var(--paytm-light);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ai-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--paytm-dark);
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mic-btn {
+            width: 60px;
+            height: 60px;
+            background-color: var(--paytm-light);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 186, 242, 0.3);
+            transition: all 0.2s;
+        }
+
+        .mic-btn.listening {
+            background-color: #ff3b30;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+        }
+
+        .ai-status {
+            font-size: 12px;
+            color: #555;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* चैट टाइपिंग बॉक्स स्टाइल */
+        .ai-chat-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .ai-chat-wrapper input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ced6e0;
+            border-radius: 10px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .ai-chat-btn {
+            background-color: var(--paytm-dark);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* पेटीएम स्टाइल ग्रिड */
+        .paytm-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .grid-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f7ff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .grid-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* पेमेंट फॉर्म */
+        .payment-form {
+            background-color: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 15px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced6e0;
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #fafbfc;
+            margin-bottom: 12px;
+        }
+
+        .paytm-btn {
+            width: 100%;
+            background-color: #00baf2;
+            color: var(--white);
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* 📜 पासबुक ओवरले पेज */
+        .page-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .overlay-header {
+            background-color: var(--paytm-dark);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: bold;
+        }
+
+        .back-arrow {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .overlay-content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .txn-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .txn-avatar {
+            width: 38px;
+            height: 38px;
+            background-color: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--paytm-blue);
+        }
+
+        /* 🟢 पेमेंट सक्सेस स्क्रीन ओवरले */
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #002e6e;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .success-circle {
+            width: 80px;
+            height: 80px;
+            background-color: #00baf2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-screen">
+    <!-- टॉप बार -->
+    <div class="paytm-navbar">
+        <div class="nav-left">
+            <div class="profile-icon">KR</div>
+            <div class="paytm-logo-text">paytm<span>.</span></div>
+            <div class="offline-tag">AI POWERED</div>
+        </div>
+        <div style="font-size: 18px;">🔍</div>
+    </div>
+
+    <div class="main-content">
+        <!-- वॉलेट बैलेंस -->
+        <div class="balance-strip">
+            <p style="margin:0; font-size:12px; opacity:0.8;">Paytm Balance (Offline Wallet)</p>
+            <div class="balance-val">₹<span id="walletBal">5,000.00</span></div>
+            <p style="margin:5px 0 0 0; font-size:11px; opacity:0.9;">✓ Real Microphone Input Active</p>
+        </div>
+
+        <!-- 🤖 AI असिस्टेंट वॉयस & चैट कंट्रोल पैनल -->
+        <div class="ai-assistant-card">
+            <div class="ai-title">🤖 Super Offline AI Assistant (Multi-Task)</div>
+            <button class="mic-btn" id="micButton" onclick="triggerVoiceAssistant()">🎤</button>
+            <div class="ai-status" id="aiStatus">मुझसे बातचीत करें या कुलदीप जी को पे करने के लिए बटन दबाएं...</div>
+            
+            <!-- ⌨️ टाइपिंग चैट बॉक्स -->
+            <div class="ai-chat-wrapper">
+        <input type="text" id="aiTextInput" placeholder="असिस्टेंट से टाइप करके बात करें...">
+        <button class="ai-chat-btn" onclick="processTextCommand()">Send</button>
+    </div>
+</div>
+
+<div class="paytm-grid">
+    <div class="grid-item" onclick="alert('📸 QR स्कैन सिम्युलेटर सक्रिय!')">
+        <div class="grid-icon">📸</div>
+        <div class="grid-text">Scan & Pay</div>
+    </div>
+    <div class="grid-item" onclick="document.getElementById('targetUser').focus();">
+        <div class="grid-icon">📱</div>
+        <div class="grid-text">To Mobile</div>
+    </div>
+    <div class="grid-item" onclick="alert('To Bank सुविधा ऑफलाइन सिंक मोड में है')">
+        <div class="grid-icon">🏦</div>
+        <div class="grid-text">To Bank</div>
+    </div>
+    <div class="grid-item" onclick="openPassbookPage()">
+        <div class="grid-icon">📄</div>
+        <div class="grid-text">Passbook</div>
+    </div>
+</div>
+
+<div class="payment-form">
+    <div style="font-size:14px; font-weight:700; color:var(--paytm-dark); margin-bottom:10px;">Or Pay Manually</div>
+    <div class="input-wrapper"><input type="text" id="targetUser" placeholder="Enter Mobile or UPI ID" value="Kuldeep Ji"></div>
+    <div class="input-wrapper"><input type="number" id="targetAmount" placeholder="Enter Amount (₹)"></div>
+    <button class="paytm-btn" onclick="executePaytmPayment(false)">Proceed Securely</button>
+</div>
+</div>
+
+<!-- 📜 पासबुक ओवरले पेज -->
+<div class="page-overlay" id="passbookPage">
+<div class="overlay-header">
+    <span class="back-arrow" onclick="closePassbookPage()">←</span>
+    <span>Paytm Passbook & History</span>
+</div>
+<div class="overlay-content" id="txnHistoryList"></div>
+</div>
+
+<!-- 🟢 पेटीएम सक्सेस स्क्रीन ओवरले -->
+<div class="success-overlay" id="successScreen">
+<div class="success-circle">✓</div>
+<div class="success-title" id="successTitle">Paytm Payment Successful</div>
+<div class="success-amt">₹<span id="receiptAmt">0.00</span></div>
+<div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; width: 85%; font-size: 13px; margin-bottom: 30px;">
+    <p style="margin: 5px 0; text-align: left;"><b>To:</b> <span id="receiptTo">N/A</span></p>
+    <p style="margin: 5px 0; text-align: left;"><b>AI Confirmation:</b> Voice Response Completed</p>
+    <p style="margin: 5px 0; text-align: left; font-size: 11px; opacity: 0.7;">Verified via Offline Local Ledger</p>
+</div>
+<button class="paytm-btn" style="background-color: var(--white); color: var(--paytm-dark); width: auto; padding: 12px 40px;" onclick="closeReceiptOverlay()">Done</button>
+</div>
+</div>
+
+<script>
+let currentBalance = parseFloat(localStorage.getItem('paytm_balance')) || 5000.00;
+
+window.onload = function() {
+document.getElementById('walletBal').innerText = currentBalance.toFixed(2);
+loadTransactionHistory();
+};
+
+// 🎵 पेटीएम ओरिजिनल पेमेंट सक्सेस टोन जनरेटर (Web Audio API)
+function playPaytmSuccessTone() {
+if (window.AudioContext || window.webkitAudioContext) {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    let osc1 = audioCtx.createOscillator();
+    let gain1 = audioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(1200, audioCtx.currentTime); 
+    gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    osc1.connect(gain1);
+    gain1.connect(audioCtx.destination);
+    osc1.start();
+    osc1.stop(audioCtx.currentTime + 0.08);
+
+    setTimeout(() => {
+        let osc2 = audioCtx.createOscillator();
+        let gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1500, audioCtx.currentTime); 
+        gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start();
+        osc2.stop(audioCtx.currentTime + 0.3);
+    }, 80);
+}
+}
+
+// 🗣️ AI असिस्टेंट ऑफलाइन वॉइस इंजन
+function speakText(text) {
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel(); 
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'hi-IN';
+    msg.rate = 1.0; 
+    msg.pitch = 1.1; 
+    window.speechSynthesis.speak(msg);
+}
+}
+
+// 🎤 असली वॉयस रिकग्निशन इंजन (ब्राउज़र स्पीच डिटेक्शन)
+function triggerVoiceAssistant() {
+const mic = document.getElementById('micButton');
+const status = document.getElementById('aiStatus');
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SpeechRecognition) {
+    alert("आपका ब्राउज़र वॉयस रिकग्निशन सपोर्ट नहीं करता। कृपया टाइपिंग बॉक्स का उपयोग करें।");
+    return;
+}
+
+const recognition = new SpeechRecognition();
+recognition.lang = 'hi-IN'; 
+recognition.interimResults = false;
+recognition.maxAlternatives = 1;
+
+mic.classList.add('listening');
+status.innerText = "सुन रहा हूँ... कृपया बोलिए...";
+status.style.color = "#ff3b30";
+
+recognition.start();
+
+recognition.onresult = function(event) {
+    const spokenText = event.results.transcript.toLowerCase();
+    status.innerText = `आपने कहा: "${event.results.transcript}"`;
+    status.style.color = "#002e6e";
+    mic.classList.remove('listening');
+    
+    processAIIntelligence(spokenText);
+};
+
+recognition.onerror = function(event) {
+    mic.classList.remove('listening');
+    status.innerText = "आवाज़ साफ नहीं आई। कृपया दोबारा कोशिश करें या टाइप करें।";
+    status.style.color = "#ff3b30";
+};
+
+recognition.onend = function() {
+    mic.classList.remove('listening');
+};
+}
+
+// ⌨️ टाइप किए गए मैसेज को प्रोसेस करना
+function processTextCommand() {
+const textInput = document.getElementById('aiTextInput');
+const status = document.getElementById('aiStatus');
+const commandText = textInput.value.trim().toLowerCase();
+
+if (!commandText) return;
+
+status.innerText = `टाइप किया: "${textInput.value}"`;
+status.style.color = "#002e6e";
+
+processAIIntelligence(commandText);
+textInput.value = ""; 
+}
+
+// 🧠 केंद्रीय AI कोर लॉजिक (Text और Voice दोनों के लिए)
+function processAIIntelligence(inputString) {
+// 1. UPI / पेमेंट कमांड डिटेक्शन
+if (inputString.includes("pay") || inputString.includes("transfer") || inputString.includes("भेज") || inputString.includes("पे") || inputString.includes("कुलदीप")) {
+    const targetUPI = (inputString.includes("sharma") || inputString.includes("डॉटकॉम")) ? "kuldeep.sharma@paytm" : "Kuldeep Ji";
+    
+    const responseText = "ठीक है, मैं आपकी बताई गई यूपीआई आईडी पर पेमेंट ट्रांसफर करता हूँ।";
+    speakText(responseText);
+
+    document.getElementById('targetUser').value = targetUPI;
+    document.getElementById('targetAmount').value = "150";
+
+    // वॉयस रिस्पांस पूरा होने के बाद सुरक्षित पेमेंट एक्जीक्यूट होगी
+    setTimeout(() => {
+        executePaytmPayment(true);
+    }, 3000); 
+} 
+
+// 2. हाल-चाल और ऐप इन्फो डिटेक्शन
+else if (inputString.includes("haal chaal") || inputString.includes("kaise ho") || inputString.includes("app kya hai") || inputString.includes("हाल चाल") || inputString.includes("कैसे हो")) {
+    const responseText = "मैं बिल्कुल ठीक हूँ भाई! मैं पेटीएम का ऑफ़लाइन ए१ असिस्टेंट हूँ। मैं बिना इंटरनेट के आपकी आवाज़ या मैसेज पर ऑटो-पेमेंट कर सकता हूँ और आपके पैसों का हिसाब रख सकता हूँ।";
+    speakText(responseText);
+    alert(`🤖 AI असिस्टेंट: ${responseText}`);
+} 
+
+// 3. EMI कैलकुलेशन डिटेक्शन
+else if (inputString.includes("emi") || inputString.includes("interest") || inputString.includes("ब्याज") || inputString.includes("ईएमआई") || inputString.includes("लोन")) {
+    const responseText = "एक लाख रुपये पर दस परसेंट ब्याज के हिसाब से एक साल की मासिक ईएमआई नौ हजार एक सौ छियासठ रुपये होगी। जानकारी को सफलतापूर्वक सेव और अपडेट कर दिया गया है!";
+    speakText(responseText);
+    alert(`🤖 AI असिस्टेंट (EMI कैलकुलेटर): ${responseText}`);
+} 
+
+// 4. डिफ़ॉल्ट रिस्पांस
+else {
+    const responseText = "क्षमा करें, मैं अभी ऑफलाइन मोड में हूँ। आप मुझसे पेमेंट करने, ईएमआई का हिसाब पूछने या मेरा हाल-चाल जानने के लिए कह सकते हैं।";
+    speakText(responseText);
+}
+}
+
+// पेमेंट प्रोसेसिंग लॉजिक
+function executePaytmPayment(isAiTriggered) {
+const user = document.getElementById('targetUser').value.trim();
+const amt = parseFloat(document.getElementById('targetAmount').value);
+
+if (!user || isNaN(amt) || amt <= 0) {
+    alert("कृपया सही विवरण भरें।");
+    return;
+}
+if (amt > currentBalance) {
+    alert("अपर्याप्त बैलेंस!");
+    return;
+}
+
+currentBalance -= amt;
+localStorage.setItem('paytm_balance', currentBalance);
+document.getElementById('walletBal').innerText = currentBalance.toFixed(2);
+
+document.getElementById('receiptAmt').innerText = amt.toFixed(2);
+document.getElementById('targetUser').value = user;
+document.getElementById('receiptTo').innerText = user;
+
+if(isAiTriggered) {
+    document.getElementById('successTitle').innerText = "AI Voice Auto-Pay Successful";
+} else {
+    document.getElementById('successTitle').innerText = "Paytm Payment Successful";
+}
+
+document.getElementById('successScreen').style.display = 'flex';
+
+// 🎵 पेटीएम बीप टोन प्ले करना
+playPaytmSuccessTone();
+
+// 🗣️ ट्यून के बाद असिस्टेंट पुष्टिकरण
+setTimeout(() => {
+    speakText("आपकी पेमेंट पूरी हो चुकी है।");
+}, 600);
+
+// हिस्ट्री को LocalStorage में डालना
+const newTxn = {
+    to: user,
+    amount: amt,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: new Date().toLocaleDateString(),
+    mode: isAiTriggered ? "Voice Auto-Pay" : "Manual"
+};
+let txns = JSON.parse(localStorage.getItem('paytm_txns')) || [];
+txns.unshift(newTxn);
+localStorage.setItem('paytm_txns', JSON.stringify(txns));
+loadTransactionHistory();
+
+// फॉर्म रीसेट
+document.getElementById('targetUser').value = "Kuldeep Ji";
+document.getElementById('targetAmount').value = "";
+document.getElementById('aiStatus').innerText = "मुझसे बातचीत करें या कुलदीप जी को पे करने के लिए बटन दबाएं...";
+document.getElementById('aiStatus').style.color = "#555";
+}
+
+function openPassbookPage() {
+document.getElementById('passbookPage').style.display = 'flex';
+}
+
+function closePassbookPage() {
+document.getElementById('passbookPage').style.display = 'none';
+}
+
+function loadTransactionHistory() {
+    const historyList = document.getElementById('txnHistoryList');
+    let txns = JSON.parse(localStorage.getItem('paytm_txns')) || [];
+
+    if (txns.length === 0) {
+        historyList.innerHTML = `<div style="text-align: center; color: #777; font-size: 14px; padding: 30px;">No transactions recorded offline yet.</div>`;
+        return;
+    }
+
+    historyList.innerHTML = "";
+    txns.forEach(txn => {
+        const item = document.createElement('div');
+        item.className = 'txn-card';
+        const initial = txn.to.substring(0, 2).toUpperCase();
+
+        item.innerHTML = `
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="txn-avatar">${initial}</div>
+                <div>
+                    <div style="font-size:14px; font-weight:600; color:#2d3748;">Paid to ${txn.to}</div>
+                    <div style="font-size:11px; color:#a0aec0;">${txn.date}, ${txn.time} | Mode: ${txn.mode}</div>
+                </div>
+            </div>
+            <div style="font-weight:700; font-size:15px; color:#111;">- ₹${txn.amount.toFixed(2)}</div>
+        `;
+        historyList.appendChild(item);
+    });
+}
+
+function closeReceiptOverlay() {
+    document.getElementById('successScreen').style.display = 'none';
+}
+</script>
+</body>
+</html>
